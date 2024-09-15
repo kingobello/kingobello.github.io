@@ -1,20 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fridge Recipe App</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Finder</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+    }
+    .navbar {
+      margin-bottom: 20px;
+    }
+    .container {
+      max-width: 1200px;
+    }
+    .form-inline {
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+    .recipe {
+      border: 1px solid #ccc;
+      padding: 16px;
+      margin: 16px;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+    .recipe:hover {
+      transform: scale(1.05);
+    }
+    .recipe img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .recipe h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    .recipe p {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    footer {
+      background-color: #343a40;
+      color: #fff;
+      padding: 20px 0;
+      text-align: center;
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Fridge Recipe App</h1>
-  <form id="ingredient-form">
-    <label for="ingredients">Enter ingredients (comma-separated):</label><br />
-    <input type="text" id="ingredients" name="ingredients" required /><br /><br />
-    <button type="submit">Find Recipes</button>
-  </form>
-  <div id="recipes"></div>
-  <script src="script.js"></script>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Recipe Finder</a>
+  </nav>
+  <div class="container">
+    <h1 class="text-center my-4">Find Recipes Based on Your Ingredients</h1>
+    <form id="ingredients-form" class="form-inline">
+      <input type="text" id="ingredients-input" class="form-control mr-2" placeholder="Enter ingredients (comma separated)" required>
+      <button type="submit" class="btn btn-primary">Find Recipes</button>
+    </form>
+    <div id="recipes-container" class="row"></div>
+  </div>
+  <footer>
+    <p>&copy; 2023 Recipe Finder. All rights reserved.</p>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    document.getElementById('ingredients-form').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const ingredients = document.getElementById('ingredients-input').value;
+      if (!ingredients) return;
+
+      console.log('Fetching recipes for ingredients:', ingredients);
+
+      try {
+        const response = await fetch(`http://localhost:5001/api/recipes?ingredients=${ingredients}`);
+        console.log('Response status:', response.status); // Debugging statement
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const recipes = await response.json();
+        console.log('Recipes fetched:', recipes);
+        displayRecipes(recipes);
+      } catch (error) {
+        console.error('Error fetching recipes:', error);
+      }
+    });
+
+    function displayRecipes(recipes) {
+      const container = document.getElementById('recipes-container');
+      container.innerHTML = '';
+
+      if (recipes.length === 0) {
+        container.innerHTML = '<p>No recipes found.</p>';
+        return;
+      }
+
+      recipes.forEach(recipe => {
+        const recipeElement = document.createElement('div');
+        recipeElement.className = 'col-md-4 recipe';
+
+        const title = document.createElement('h2');
+        title.textContent = recipe.title;
+
+        const image = document.createElement('img');
+        image.src = recipe.image;
+        image.alt = recipe.title;
+
+        const usedIngredients = document.createElement('p');
+        usedIngredients.textContent = `Used Ingredients: ${recipe.usedIngredients.map(ing => ing.name).join(', ')}`;
+
+        const missedIngredients = document.createElement('p');
+        missedIngredients.textContent = `Missed Ingredients: ${recipe.missedIngredients.map(ing => ing.name).join(', ')}`;
+
+        recipeElement.appendChild(title);
+        recipeElement.appendChild(image);
+        recipeElement.appendChild(usedIngredients);
+        recipeElement.appendChild(missedIngredients);
+
+        container.appendChild(recipeElement);
+      });
+    }
+  </script>
 </body>
 </html>
