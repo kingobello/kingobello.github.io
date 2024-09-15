@@ -83,7 +83,7 @@
       console.log('Fetching recipes for ingredients:', ingredients);
 
       try {
-        const response = await fetch(`http://localhost:5001/api/recipes?ingredients=${ingredients}`);
+        const response = await fetch(`https://your-heroku-app.herokuapp.com/api/recipes?ingredients=${ingredients}`);
         console.log('Response status:', response.status); // Debugging statement
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
