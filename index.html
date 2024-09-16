@@ -83,7 +83,7 @@
       console.log('Fetching recipes for ingredients:', ingredients);
 
       try {
-        const response = await fetch(`https://floating-waters-00042-5ba55a6c8e79.herokuapp.com/api/recipes?ingredients=${ingredients}`);
+        const response = await fetch(`https://floating-waters-00042.herokuapp.com/api/recipes?ingredients=${ingredients}`);
         console.log('Response status:', response.status); // Debugging statement
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
